@@ -3,7 +3,6 @@
 Une visionneuse d’arbre généalogique moderne pour les fichiers **GEDCOM** (`.ged`).
 Le fichier est lu dans le navigateur : rien n’est envoyé sur un serveur.
 
-
 ![Arbre centré sur une personne, avec sa fiche ouverte](docs/arbre.jpg)
 
 ![Éventail des ancêtres, survol d’une lignée](docs/eventail.jpg)
