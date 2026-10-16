@@ -1,0 +1,343 @@
+0 HEAD
+1 SOUR SOUCHE
+2 NAME Famille fictive de démonstration
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE-LINKED
+1 CHAR UTF-8
+1 LANG French
+0 @I1@ INDI
+1 NAME Lucie Anne /MOREL/
+2 GIVN Lucie Anne
+2 SURN MOREL
+1 SEX F
+1 BIRT
+2 DATE 14 MAR 1998
+2 PLAC Lyon, Rhône, Auvergne-Rhône-Alpes, France
+1 OCCU Architecte
+1 FAMC @F1@
+0 @I2@ INDI
+1 NAME Thomas /MOREL/
+1 SEX M
+1 BIRT
+2 DATE 2 FEB 1968
+2 PLAC Villeurbanne, Rhône, Auvergne-Rhône-Alpes, France
+1 OCCU Professeur de physique
+1 FAMC @F3@
+1 FAMS @F1@
+1 FAMS @F2@
+0 @I3@ INDI
+1 NAME Claire /LACOMBE/
+1 SEX F
+1 BIRT
+2 DATE 30 JUN 1970
+2 PLAC Grenoble, Isère, Auvergne-Rhône-Alpes, France
+1 FAMC @F5@
+1 FAMS @F1@
+0 @I4@ INDI
+1 NAME Hugo /MOREL/
+1 SEX M
+1 BIRT
+2 DATE 9 SEP 2001
+2 PLAC Lyon, Rhône, Auvergne-Rhône-Alpes, France
+1 FAMC @F1@
+0 @I5@ INDI
+1 NAME Sophie /BERNARD/
+1 SEX F
+1 BIRT
+2 DATE 1975
+1 FAMS @F2@
+0 @I6@ INDI
+1 NAME Léa /MOREL/
+1 SEX F
+1 BIRT
+2 DATE 21 DEC 2012
+2 PLAC Annecy, Haute-Savoie, Auvergne-Rhône-Alpes, France
+1 FAMC @F2@
+0 @I7@ INDI
+1 NAME Henri Louis /MOREL/
+1 SEX M
+1 BIRT
+2 DATE 11 APR 1938
+2 PLAC Saint-Étienne, Loire, Auvergne-Rhône-Alpes, France
+2 SOUR @S2@
+1 OCCU Cheminot
+1 DEAT
+2 DATE 3 OCT 2015
+2 PLAC Villeurbanne, Rhône, Auvergne-Rhône-Alpes, France
+2 SOUR @S2@
+3 PAGE Acte n°1142
+1 FAMC @F6@
+1 FAMS @F3@
+0 @I8@ INDI
+1 NAME Jeanne /VIDAL/
+1 SEX F
+1 BIRT
+2 DATE 25 JAN 1941
+2 PLAC Le Puy-en-Velay, Haute-Loire, Auvergne-Rhône-Alpes, France
+1 FAMC @F7@
+1 FAMS @F3@
+0 @I9@ INDI
+1 NAME Anne /MOREL/
+1 SEX F
+1 BIRT
+2 DATE 17 AUG 1965
+2 PLAC Villeurbanne, Rhône, Auvergne-Rhône-Alpes, France
+1 FAMC @F3@
+1 FAMS @F4@
+0 @I10@ INDI
+1 NAME Marc /DUPUIS/
+1 SEX M
+1 BIRT
+2 DATE ABT 1963
+1 FAMS @F4@
+0 @I11@ INDI
+1 NAME Julien /DUPUIS/
+1 SEX M
+1 BIRT
+2 DATE 5 MAY 1990
+2 PLAC Bron, Rhône, Auvergne-Rhône-Alpes, France
+1 FAMC @F4@
+0 @I12@ INDI
+1 NAME Pierre /LACOMBE/
+1 SEX M
+1 BIRT
+2 DATE 8 NOV 1935
+2 PLAC Voiron, Isère, Auvergne-Rhône-Alpes, France
+1 OCCU Menuisier
+1 DEAT
+2 DATE 19 FEB 2001
+2 PLAC Grenoble, Isère, Auvergne-Rhône-Alpes, France
+1 FAMC @F8@
+1 FAMS @F5@
+0 @I13@ INDI
+1 NAME Marie-Louise /ROUX/
+1 SEX F
+1 BIRT
+2 DATE 1 JUL 1939
+2 PLAC Gap, Hautes-Alpes, Provence-Alpes-Côte d'Azur, France
+1 DEAT
+2 DATE 12 DEC 2020
+2 PLAC Grenoble, Isère, Auvergne-Rhône-Alpes, France
+1 FAMC @F9@
+1 FAMS @F5@
+0 @I14@ INDI
+1 NAME Louis /MOREL/
+1 SEX M
+1 BIRT
+2 DATE ABT 1905
+2 PLAC Saint-Chamond, Loire, Auvergne-Rhône-Alpes, France
+1 OCCU Mineur
+1 DEAT
+2 DATE 1978
+1 FAMC @F10@
+1 FAMS @F6@
+0 @I15@ INDI
+1 NAME Germaine /FAURE/
+1 SEX F
+1 BIRT
+2 DATE 4 MAR 1910
+2 PLAC Firminy, Loire, Auvergne-Rhône-Alpes, France
+1 DEAT
+2 DATE 22 JUN 1990
+1 FAMC @F11@
+1 FAMS @F6@
+0 @I16@ INDI
+1 NAME Émile /VIDAL/
+1 SEX M
+1 BIRT
+2 DATE 2 FEB 1912
+2 PLAC Le Puy-en-Velay, Haute-Loire, Auvergne-Rhône-Alpes, France
+1 DEAT
+2 DATE 18 AUG 1944
+2 PLAC Montélimar, Drôme, Auvergne-Rhône-Alpes, France
+2 NOTE Mort pour la France.
+1 FAMS @F7@
+0 @I17@ INDI
+1 NAME Rose /BLANC/
+1 SEX F
+1 BIRT
+2 DATE 15 MAY 1915
+1 DEAT
+2 DATE 2003
+1 FAMS @F7@
+0 @I18@ INDI
+1 NAME Auguste /LACOMBE/
+1 SEX M
+1 BIRT
+2 DATE BEF 1900
+1 DEAT
+2 DATE 1960
+2 PLAC Voiron, Isère, Auvergne-Rhône-Alpes, France
+1 NOTE Épouse inconnue. Chercher le mariage dans les registres de Voiron vers 1930.
+1 FAMS @F8@
+0 @I19@ INDI
+1 NAME Jean /ROUX/
+1 SEX M
+1 BIRT
+2 DATE 1908
+2 PLAC Gap, Hautes-Alpes, Provence-Alpes-Côte d'Azur, France
+1 DEAT
+2 DATE 1970
+1 FAMS @F9@
+0 @I20@ INDI
+1 NAME Marthe /GIRAUD/
+1 SEX F
+1 BIRT
+2 DATE 1911
+1 DEAT
+2 DATE 1999
+1 FAMC @F14@
+1 FAMS @F9@
+0 @I21@ INDI
+1 NAME Joseph /MOREL/
+1 SEX M
+1 BIRT
+2 DATE ABT 1875
+2 PLAC Saint-Chamond, Loire, Auvergne-Rhône-Alpes, France
+1 OCCU Cultivateur
+1 DEAT
+2 DATE 1930
+1 FAMC @F12@
+1 FAMS @F10@
+0 @I22@ INDI
+1 NAME Victorine /ARNAUD/
+1 SEX F
+1 BIRT
+2 DATE 1880
+1 DEAT
+2 DATE 1950
+1 FAMS @F10@
+0 @I23@ INDI
+1 NAME François /FAURE/
+1 SEX M
+1 BIRT
+2 DATE BET 1870 AND 1875
+1 DEAT
+2 DATE 1918
+1 NOTE Mort pour la France, à confirmer sur Mémoire des hommes.
+1 FAMS @F11@
+0 @I24@ INDI
+1 NAME Marie //
+1 GIVN Marie
+1 SEX F
+1 NOTE Nom de famille inconnu.
+1 FAMS @F11@
+0 @I25@ INDI
+1 NAME Jean-Baptiste /MOREL/
+1 SEX M
+1 BIRT
+2 DATE ABT 1840
+1 OCCU Journalier
+1 DEAT
+2 DATE ABT 1900
+1 FAMC @F13@
+1 FAMS @F12@
+0 @I26@ INDI
+1 NAME Catherine /PONS/
+1 SEX F
+1 BIRT
+2 DATE 1845
+2 SOUR @S1@
+3 PAGE Registre 1845, f°12
+1 FAMS @F12@
+0 @I27@ INDI
+1 NAME Pierre /MOREL/
+1 SEX M
+1 BIRT
+2 DATE ABT 1810
+1 FAMS @F13@
+0 @I28@ INDI
+1 NAME /GIRAUD/
+1 SEX M
+1 NOTE Père de Marthe, prénom inconnu.
+1 FAMS @F14@
+0 @I29@ INDI
+1 NAME Paul /VIDAL/
+1 SEX M
+1 BIRT
+2 DATE 1946
+1 NOTE Rattaché à Émile, mais né après son décès : à vérifier.
+1 FAMC @F7@
+0 @F1@ FAM
+1 HUSB @I2@
+1 WIFE @I3@
+1 CHIL @I1@
+1 CHIL @I4@
+1 MARR
+2 DATE 18 JUN 1994
+2 PLAC Grenoble, Isère, Auvergne-Rhône-Alpes, France
+1 DIV
+2 DATE 2006
+0 @F2@ FAM
+1 HUSB @I2@
+1 WIFE @I5@
+1 CHIL @I6@
+1 MARR
+2 DATE 2010
+0 @F3@ FAM
+1 HUSB @I7@
+1 WIFE @I8@
+1 CHIL @I9@
+1 CHIL @I2@
+1 MARR
+2 DATE 7 JUL 1962
+2 PLAC Le Puy-en-Velay, Haute-Loire, Auvergne-Rhône-Alpes, France
+0 @F4@ FAM
+1 HUSB @I10@
+1 WIFE @I9@
+1 CHIL @I11@
+0 @F5@ FAM
+1 HUSB @I12@
+1 WIFE @I13@
+1 CHIL @I3@
+1 MARR
+2 DATE 1964
+0 @F6@ FAM
+1 HUSB @I14@
+1 WIFE @I15@
+1 CHIL @I7@
+1 MARR
+2 DATE ABT 1935
+0 @F7@ FAM
+1 HUSB @I16@
+1 WIFE @I17@
+1 CHIL @I8@
+1 CHIL @I29@
+0 @F8@ FAM
+1 HUSB @I18@
+1 CHIL @I12@
+0 @F9@ FAM
+1 HUSB @I19@
+1 WIFE @I20@
+1 CHIL @I13@
+0 @F10@ FAM
+1 HUSB @I21@
+1 WIFE @I22@
+1 CHIL @I14@
+1 MARR
+2 DATE 1902
+2 PLAC Saint-Chamond, Loire, Auvergne-Rhône-Alpes, France
+0 @F11@ FAM
+1 HUSB @I23@
+1 WIFE @I24@
+1 CHIL @I15@
+0 @F12@ FAM
+1 HUSB @I25@
+1 WIFE @I26@
+1 CHIL @I21@
+1 MARR
+2 DATE ABT 1870
+0 @F13@ FAM
+1 HUSB @I27@
+1 CHIL @I25@
+0 @F14@ FAM
+1 HUSB @I28@
+1 CHIL @I20@
+0 @S1@ SOUR
+1 TITL Registres paroissiaux de Saint-Chamond
+1 AUTH Archives départementales de la Loire
+0 @S2@ SOUR
+1 TITL État civil de Saint-Étienne
+1 AUTH Archives municipales
+0 TRLR
