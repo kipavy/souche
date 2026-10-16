@@ -10,9 +10,12 @@ import { CARD_W, hourglass } from './hourglass'
 const file = process.env.SOUCHE_FILE
 
 describe.skipIf(!file || !existsSync(file))('own GEDCOM file', () => {
-  const tree = buildTree(readFileSync(file!, 'utf8'))
+  // Read lazily: the describe body is still collected when the suite is skipped.
+  let cached: ReturnType<typeof buildTree> | undefined
+  const load = () => (cached ??= buildTree(readFileSync(file!, 'utf8')))
 
   it('lays out every person without overlapping cards', () => {
+    const tree = load()
     for (const id of tree.persons.keys()) {
       const { nodes } = hourglass(tree, id, { up: 4, down: 3, siblings: true })
       for (const a of nodes)
@@ -23,6 +26,7 @@ describe.skipIf(!file || !existsSync(file))('own GEDCOM file', () => {
   })
 
   it('labels every relation and audits', () => {
+    const tree = load()
     const rel = allRelations(tree, tree.order[0])
     expect([...rel.values()].every((r) => r.label)).toBe(true)
     auditTree(tree)
