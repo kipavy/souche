@@ -35,5 +35,9 @@
     "vitest": "^5.0.5"
   },
   "description": "Visionneuse d’arbre généalogique GEDCOM : arbre, éventail, chronologie, répertoire. Le fichier reste sur votre appareil.",
-  "license": "MIT"
+  "license": "MIT",
+  "packageManager": "pnpm@10.26.2",
+  "engines": {
+    "node": ">=22.12"
+  }
 }

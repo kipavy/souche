@@ -6,7 +6,7 @@ import { allRelations } from '../gedcom/relationship'
 import { fan } from './fan'
 import { CARD_W, hourglass } from './hourglass'
 
-// Smoke test on your own tree: SOUCHE_FILE=/path/to/file.ged npx vitest run own-file
+// Smoke test on your own tree: SOUCHE_FILE=/path/to/file.ged pnpm vitest run own-file
 const file = process.env.SOUCHE_FILE
 
 describe.skipIf(!file || !existsSync(file))('own GEDCOM file', () => {

@@ -23,8 +23,8 @@ Les couleurs suivent la lignée : bleu pour le côté paternel, framboise pour l
 ## Utilisation
 
 ```sh
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Ouvrez ensuite l’adresse affichée et chargez un fichier `.ged`, ou cliquez sur « Voir un exemple ».
@@ -39,17 +39,19 @@ Pour voir l’arbre se mettre à jour à chaque enregistrement du `.ged`, deux o
    SOUCHE_FILE=C:/chemin/vers/arbre.ged
    ```
 
-   `npm run dev` charge alors ce fichier directement et le relit dès qu’il change, y compris sur un lecteur réseau.
+   `pnpm dev` charge alors ce fichier directement et le relit dès qu’il change, y compris sur un lecteur réseau.
 
 2. **Dans le navigateur** : avec Chrome ou Edge, « Ouvrir un fichier .ged » garde un accès au fichier et le relit à chaque modification. Sous Brave, activez d’abord `brave://flags/#file-system-access-api`. Ailleurs, le fichier est lu une seule fois.
 
 ### Version statique
 
 ```sh
-npm run build
+pnpm build
 ```
 
-Le dossier `dist/` peut être hébergé n’importe où (GitHub Pages, un NAS…) : tout se passe dans le navigateur.
+Le dossier `dist/` peut être hébergé n’importe où (un NAS, n’importe quel hébergeur statique) : tout se passe dans le navigateur.
+
+`wrangler.jsonc` décrit un Worker Cloudflare qui sert ce dossier tel quel (fichiers statiques uniquement) : build `pnpm build`, déploiement `npx wrangler deploy`.
 
 ## Confidentialité
 
@@ -60,14 +62,14 @@ Le `.gitignore` exclut tous les fichiers `.ged`, sauf `public/exemple.ged`, qui 
 ## Développement
 
 ```sh
-npm test           # analyseur GEDCOM, dates, parentés, mise en page
-npx tsc -b         # typage
+pnpm test          # analyseur GEDCOM, dates, parentés, mise en page
+pnpm exec tsc -b   # typage
 ```
 
 Pour vérifier la mise en page sur votre propre arbre sans le versionner :
 
 ```sh
-SOUCHE_FILE=/chemin/vers/arbre.ged npx vitest run own-file
+SOUCHE_FILE=/chemin/vers/arbre.ged pnpm vitest run own-file
 ```
 
 Formats pris en charge : GEDCOM 5.5 / 5.5.1 en UTF-8 ou ANSI, dates GEDCOM (`ABT`, `BEF`, `AFT`, `BET … AND …`, `FROM … TO …`, `EST`, `CAL`), notes en ligne ou en enregistrement (`@N1@`), sources et citations.

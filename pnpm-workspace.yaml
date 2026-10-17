@@ -1,0 +1,5 @@
+# Also fetch arm64 native binaries (rolldown, oxlint): a standalone pnpm build
+# can run emulated as x64 on Windows ARM while Node itself is arm64.
+supportedArchitectures:
+  os: [current]
+  cpu: [current, arm64]
