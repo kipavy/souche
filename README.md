@@ -3,6 +3,8 @@
 Une visionneuse d’arbre généalogique moderne pour les fichiers **GEDCOM** (`.ged`).
 Le fichier est lu dans le navigateur : rien n’est envoyé sur un serveur.
 
+**Essayer en ligne : [souche.kiki-kalagan.workers.dev](https://souche.kiki-kalagan.workers.dev/)**, puis ouvrir un fichier `.ged` ou cliquer sur « Voir un exemple ».
+
 ![Arbre centré sur une personne, avec sa fiche ouverte](docs/arbre.jpg)
 
 ![Éventail des ancêtres, survol d’une lignée](docs/eventail.jpg)
