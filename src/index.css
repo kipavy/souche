@@ -775,6 +775,22 @@ select {
   color: var(--ink-3);
   margin: 0.15rem 0 0.2rem 0.55rem;
 }
+.inbreeding {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 0;
+}
+.inbreeding__value {
+  font-family: var(--font-name);
+  font-size: var(--step-2);
+  font-weight: 600;
+}
+.inbreeding__lede {
+  font-size: var(--step--1);
+  color: var(--ink-3);
+  margin: 0.2rem 0 0;
+}
 .note {
   white-space: pre-wrap;
   font-size: var(--step--1);

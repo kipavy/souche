@@ -1,5 +1,6 @@
-import { Fragment, type ReactNode } from 'react'
+import { Fragment, useMemo, type ReactNode } from 'react'
 import { formatDate, formatYear } from '../gedcom/date'
+import { coupleInbreeding, formatInbreeding, inbreeding } from '../gedcom/inbreeding'
 import { fullName, parents, siblings, unions, type Citation, type LifeEvent, type Person } from '../gedcom/model'
 import { useApp } from '../state'
 import { age, lifespan, sideColor, SIDE_LABEL } from '../util'
@@ -89,6 +90,7 @@ export function PersonPanel({ id }: { id: string }) {
               <div className="union" key={family.id}>
                 {spouse ? <PersonChip p={spouse} /> : <GhostChip label="Conjoint inconnu" />}
                 {facts && <div className="union__label">{facts}</div>}
+                {family.husband && family.wife && <CoupleInbreeding husband={family.husband} wife={family.wife} />}
                 {family.notes.map((n, i) => (
                   <p className="union__label" key={i}>{n}</p>
                 ))}
@@ -116,6 +118,8 @@ export function PersonPanel({ id }: { id: string }) {
         </>
       )}
 
+      <Inbreeding id={id} />
+
       {p.notes.length > 0 && (
         <>
           <h3>Notes</h3>
@@ -127,6 +131,50 @@ export function PersonPanel({ id }: { id: string }) {
 
       <Sources person={p} />
     </aside>
+  )
+}
+
+/** Wright's coefficient, shown only when the parents are related. */
+function Inbreeding({ id }: { id: string }) {
+  const { tree } = useApp()
+  const ib = useMemo(() => inbreeding(tree, id), [tree, id])
+  if (!ib.f) return null
+  const { percent, fraction } = formatInbreeding(ib.f)
+  return (
+    <>
+      <h3>Consanguinité</h3>
+      <p className="inbreeding">
+        <strong className="inbreeding__value num">{percent}</strong>
+        <span className="muted num">{fraction}</span>
+      </p>
+      <p className="inbreeding__lede">
+        Coefficient de Wright : probabilité d’avoir reçu deux fois le même gène d’un ancêtre commun aux deux parents.
+      </p>
+      <h4>{ib.common.flatMap((c) => c.ancestors).length > 1 ? 'Ancêtres communs des parents' : 'Ancêtre commun des parents'}</h4>
+      {ib.common.map((c) => (
+        <div className="union" key={c.ancestors.map((a) => a.id).join('+')}>
+          <div className="union__label">Parents {c.label}</div>
+          <div className="chips">
+            {c.ancestors.map((a) => (
+              <PersonChip key={a.id} p={a} />
+            ))}
+          </div>
+        </div>
+      ))}
+      {ib.moreDistant && <p className="inbreeding__lede">S’y ajoutent des ancêtres communs plus éloignés.</p>}
+    </>
+  )
+}
+
+function CoupleInbreeding({ husband, wife }: { husband: string; wife: string }) {
+  const { tree } = useApp()
+  const ib = useMemo(() => coupleInbreeding(tree, husband, wife), [tree, husband, wife])
+  if (!ib.f || !ib.common.length) return null
+  const { percent, fraction } = formatInbreeding(ib.f)
+  return (
+    <div className="union__label" title="Coefficient de consanguinité (Wright) de leurs enfants">
+      Conjoints {ib.common[0].label} : consanguinité des enfants {percent} ({fraction})
+    </div>
   )
 }
 

@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { buildTree } from '../gedcom/model'
 import { auditTree } from '../gedcom/quality'
+import { consanguineousCouples, inbreeding } from '../gedcom/inbreeding'
 import { allRelations } from '../gedcom/relationship'
 import { fan } from './fan'
 import { CARD_W, hourglass } from './hourglass'
@@ -30,5 +31,15 @@ describe.skipIf(!file || !existsSync(file))('own GEDCOM file', () => {
     const rel = allRelations(tree, tree.order[0])
     expect([...rel.values()].every((r) => r.label)).toBe(true)
     auditTree(tree)
+  })
+
+  it('computes inbreeding for everyone', () => {
+    const tree = load()
+    for (const id of tree.persons.keys()) {
+      const { f } = inbreeding(tree, id)
+      expect(f).toBeGreaterThanOrEqual(0)
+      expect(f).toBeLessThan(1)
+    }
+    consanguineousCouples(tree)
   })
 })

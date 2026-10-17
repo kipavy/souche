@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { consanguineousCouples, formatInbreeding } from '../gedcom/inbreeding'
 import { fullName } from '../gedcom/model'
 import { auditTree, completeness, type IssueKind } from '../gedcom/quality'
 import { brickWalls } from '../gedcom/relationship'
@@ -18,6 +19,7 @@ export function AuditView() {
   const issues = useMemo(() => auditTree(tree), [tree])
   const stats = useMemo(() => completeness(tree), [tree])
   const walls = useMemo(() => brickWalls(tree, refId), [tree, refId])
+  const couples = useMemo(() => consanguineousCouples(tree), [tree])
   const [openGroup, setOpenGroup] = useState<IssueKind | null>(null)
   const ref = tree.persons.get(refId)
 
@@ -115,6 +117,32 @@ export function AuditView() {
             </section>
           )
         })}
+
+        {couples.length > 0 && (
+          <section>
+            <h2>
+              Unions consanguines <span className="muted num">({couples.length})</span>
+            </h2>
+            <p className="lede">Les couples apparentés par le sang, avec le coefficient de consanguinité (Wright) de leurs enfants.</p>
+            <ul className="issues">
+              {couples.map((c) => {
+                const { percent, fraction } = formatInbreeding(c.inbreeding.f)
+                // Open a child's card when there is one: it details the common ancestors.
+                const target = tree.families.get(c.familyId)?.children[0] ?? c.husband.id
+                return (
+                  <li key={c.familyId} onClick={() => select(target)} tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && select(target)}>
+                    <span className="issues__who">
+                      {fullName(c.husband)} et {fullName(c.wife)}
+                    </span>
+                    <span>
+                      <span className="num">{percent}</span> <span className="muted num">{fraction}</span>, {c.inbreeding.common[0]?.label}
+                    </span>
+                  </li>
+                )
+              })}
+            </ul>
+          </section>
+        )}
 
         <div className="cols">
           <section>
