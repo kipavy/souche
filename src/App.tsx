@@ -4,6 +4,7 @@ import { auditTree } from './gedcom/quality'
 import { allRelations } from './gedcom/relationship'
 import { sosaByPerson, sosaMap } from './layout/fan'
 import { useGedFile, type LoadedFile } from './source/loader'
+import { plural } from './util'
 import { AppContext, VIEWS, type AppState, type View } from './state'
 import { IconMoon, IconSearch, IconSun, Logo } from './ui/icons'
 import { PersonPanel } from './ui/PersonPanel'
@@ -194,6 +195,9 @@ function Viewer({ file, error, onClose }: { file: LoadedFile; error: string | nu
           <div className="filechip" title={file.live === 'none' ? 'Copie chargée une fois : rouvrez le fichier après modification' : 'Relu automatiquement à chaque enregistrement'}>
             {file.live !== 'none' && <span key={pulse} className={`livedot${pulse > 1 ? ' livedot--pulse' : ''}`} aria-hidden="true" />}
             <span className="filechip__name">{file.name}</span>
+            <span className="filechip__count num" title={plural(tree.families.size, 'famille', 'familles')}>
+              {plural(tree.persons.size, 'personne', 'personnes')}
+            </span>
             <span>{file.live === 'none' ? '' : `à jour ${updated}`}</span>
             {error && <span className="error">{error}</span>}
           </div>

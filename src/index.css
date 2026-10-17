@@ -292,6 +292,13 @@ select {
   white-space: nowrap;
   max-width: 14rem;
 }
+.filechip__count {
+  white-space: nowrap;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink);
+}
 .livedot {
   width: 0.5rem;
   height: 0.5rem;
