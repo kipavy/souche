@@ -7,7 +7,7 @@ const COUPLE_GAP = 14 // between spouses
 const GROUP_GAP = 40 // between children of different unions
 export const ROW = CARD_H + 74
 
-export type Role = 'focus' | 'ancestor' | 'descendant' | 'spouse' | 'sibling' | 'ghost'
+export type Role = 'focus' | 'ancestor' | 'descendant' | 'spouse' | 'sibling' | 'uncle' | 'ghost'
 
 export interface LayoutNode {
   key: string
@@ -38,6 +38,8 @@ export interface HourglassOptions {
   up: number
   down: number
   siblings: boolean
+  /** Siblings of the focus's parents (uncles and aunts), beside them; needs `up` ≥ 2 to show the grandparents. */
+  uncles?: boolean
 }
 
 interface Block {
@@ -87,7 +89,8 @@ export function hourglass(tree: Tree, focusId: string, opts: HourglassOptions): 
       const node: LayoutNode = { key: keyFor(pid), personId: pid, role: 'ancestor', x: 0, y: 0, moreUp: above.truncated }
       // `above` is already positioned relative to this parent's card.
       const b = above
-      return { minX: Math.min(-CARD_W / 2, b.minX), maxX: Math.max(CARD_W / 2, b.maxX), nodes: [node, ...b.nodes], links: b.links }
+      const block = { minX: Math.min(-CARD_W / 2, b.minX), maxX: Math.max(CARD_W / 2, b.maxX), nodes: [node, ...b.nodes], links: b.links }
+      return gen === 1 && opts.uncles && opts.up >= 2 ? withUncles(block, pid, tag === 'F' ? -1 : 1) : block
     }
 
     const fb = side(father?.id, 'F')
@@ -112,6 +115,31 @@ export function hourglass(tree: Tree, focusId: string, opts: HourglassOptions): 
       links: [...f.links, ...m.links, ...links],
       truncated: false,
     }
+  }
+
+  // ---------- uncles and aunts: the parent's siblings, on the outer side of the parent (dir -1 = left) ----------
+  function withUncles(block: Block, parentId: string, dir: -1 | 1): Block {
+    const sibs = siblings(tree, parentId) // sorted by birth
+    if (!sibs.length) return block
+    // Left side: oldest farthest out; right side: oldest nearest, so birth order reads left to right on both sides.
+    const ordered = dir === -1 ? [...sibs].reverse() : sibs
+    const nodes = [...block.nodes]
+    const links = [...block.links]
+    const full: number[] = []
+    ordered.forEach((s, i) => {
+      const x = dir * (i + 1) * (CARD_W + GAP)
+      const moreDown = unions(tree, s.person.id).reduce((n, u) => n + u.children.length, 0) || undefined
+      nodes.push({ key: keyFor(s.person.id), personId: s.person.id, role: 'uncle', x, y: 0, half: s.half, moreDown })
+      if (s.half) links.push({ key: `half:u:${s.person.id}`, d: `M${x} ${-ROW / 2}V${-CARD_H / 2}`, kind: 'half' })
+      else full.push(x)
+    })
+    if (full.length) {
+      // Extend the grandparents' bus (drawn at mid-height down to the parent) to the full siblings.
+      links.push({ key: `parent:u:${parentId}`, d: `M${Math.min(0, ...full)} ${-ROW / 2}H${Math.max(0, ...full)}`, kind: 'parent' })
+      for (const x of full) links.push({ key: `parent:u:${parentId}:${x}`, d: `M${x} ${-ROW / 2}V${-CARD_H / 2}`, kind: 'parent' })
+    }
+    const far = dir * sibs.length * (CARD_W + GAP)
+    return { minX: Math.min(block.minX, far - CARD_W / 2), maxX: Math.max(block.maxX, far + CARD_W / 2), nodes, links }
   }
 
   // ---------- descendants: blocks are relative to the person's card center ----------

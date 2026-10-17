@@ -27,24 +27,26 @@ export function TreeView() {
   const [up, setUp] = useState(() => read('souche.up', 3))
   const [down, setDown] = useState(() => read('souche.down', 2))
   const [showSiblings, setShowSiblings] = useState(() => read('souche.siblings', 1) === 1)
+  const [showUncles, setShowUncles] = useState(() => read('souche.uncles', 1) === 1)
   const { svgRef, gRef, fit, zoomBy } = useZoom()
 
   useEffect(() => write('souche.up', up), [up])
   useEffect(() => write('souche.down', down), [down])
   useEffect(() => write('souche.siblings', showSiblings ? 1 : 0), [showSiblings])
+  useEffect(() => write('souche.uncles', showUncles ? 1 : 0), [showUncles])
 
-  const layout = useMemo(() => hourglass(tree, focusId, { up, down, siblings: showSiblings }), [tree, focusId, up, down, showSiblings])
+  const layout = useMemo(() => hourglass(tree, focusId, { up, down, siblings: showSiblings, uncles: showUncles }), [tree, focusId, up, down, showSiblings, showUncles])
 
   // Reframe when the focus changes (not on every live reload of the file).
   const framedFor = useRef<string | null>(null)
   useEffect(() => {
-    const key = `${focusId}|${up}|${down}|${showSiblings}`
+    const key = `${focusId}|${up}|${down}|${showSiblings}|${showUncles}`
     const first = framedFor.current === null
     if (framedFor.current === key) return
     framedFor.current = key
     // Never frame smaller than readable cards; on small screens the focus and its parents stay in view.
     fit(layout.bounds, { animate: !first, min: 0.6, anchor: { x: 0, y: -ROW / 2 } })
-  }, [focusId, up, down, showSiblings, layout.bounds, fit])
+  }, [focusId, up, down, showSiblings, showUncles, layout.bounds, fit])
 
   // Keep people in a stable DOM order so CSS transitions can slide them.
   const nodes = useMemo(() => [...layout.nodes].sort((a, b) => (a.key < b.key ? -1 : 1)), [layout.nodes])
@@ -53,7 +55,7 @@ export function TreeView() {
     <>
       <svg ref={svgRef} className="canvas" role="img" aria-label="Arbre généalogique">
         <g ref={gRef}>
-          <g className="links" key={`${focusId}|${up}|${down}|${showSiblings}`}>
+          <g className="links" key={`${focusId}|${up}|${down}|${showSiblings}|${showUncles}`}>
             {layout.links.map((l) => (
               <path key={l.key} d={l.d} className={`link link--${l.kind}`} />
             ))}
@@ -81,6 +83,10 @@ export function TreeView() {
         <label className="switch">
           <input type="checkbox" checked={showSiblings} onChange={(e) => setShowSiblings(e.target.checked)} />
           Frères et sœurs
+        </label>
+        <label className="switch" title={up < 2 ? 'Affichez au moins 2 générations d’ascendants' : undefined}>
+          <input type="checkbox" checked={showUncles} disabled={up < 2} onChange={(e) => setShowUncles(e.target.checked)} />
+          Oncles et tantes
         </label>
         <span className="overlay__sep" />
         <button className="btn btn--quiet btn--icon" onClick={() => zoomBy(1.25)} aria-label="Zoomer"><IconPlus /></button>

@@ -18,7 +18,7 @@ describe.skipIf(!file || !existsSync(file))('own GEDCOM file', () => {
   it('lays out every person without overlapping cards', () => {
     const tree = load()
     for (const id of tree.persons.keys()) {
-      const { nodes } = hourglass(tree, id, { up: 4, down: 3, siblings: true })
+      const { nodes } = hourglass(tree, id, { up: 4, down: 3, siblings: true, uncles: true })
       for (const a of nodes)
         for (const b of nodes)
           if (a.key < b.key && a.y === b.y) expect(Math.abs(a.x - b.x), `${id}: ${a.key}/${b.key}`).toBeGreaterThanOrEqual(CARD_W)

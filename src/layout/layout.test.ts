@@ -17,10 +17,22 @@ function overlaps(nodes: { x: number; y: number; key: string }[]) {
 
 describe('hourglass', () => {
   it.each(['I1', 'I2', 'I7', 'I14', 'I27', 'I9'])('no two cards overlap around %s', (id) => {
-    for (const up of [1, 3, 6]) for (const down of [0, 2, 5]) {
-      const { nodes } = hourglass(tree, id, { up, down, siblings: true })
+    for (const up of [1, 3, 6]) for (const down of [0, 2, 5]) for (const uncles of [false, true]) {
+      const { nodes } = hourglass(tree, id, { up, down, siblings: true, uncles })
       expect(overlaps(nodes)).toEqual([])
     }
+  })
+
+  it('shows uncles and aunts beside the parents, on the outer side', () => {
+    const { nodes, links } = hourglass(tree, 'I1', { up: 2, down: 0, siblings: true, uncles: true })
+    const at = (id: string) => nodes.find((n) => n.personId === id)!
+    // I9 (Anne) is the sister of I2, the father of I1.
+    expect(at('I9')).toMatchObject({ role: 'uncle', y: at('I2').y })
+    expect(at('I9').x).toBeLessThan(at('I2').x)
+    expect(links.some((l) => l.key.startsWith('parent:u:I2'))).toBe(true)
+    // Off by default, and never without the grandparents' row.
+    expect(hourglass(tree, 'I1', { up: 2, down: 0, siblings: true }).nodes.some((n) => n.role === 'uncle')).toBe(false)
+    expect(hourglass(tree, 'I1', { up: 1, down: 0, siblings: true, uncles: true }).nodes.some((n) => n.role === 'uncle')).toBe(false)
   })
 
   it('places each generation exactly one row apart', () => {
