@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { editGedcom, GedDoc, newGedcom } from './gedcom/edit'
 import { buildTree, type Tree } from './gedcom/model'
+import { parseGedcom } from './gedcom/parse'
 import { auditTree } from './gedcom/quality'
 import { allRelations } from './gedcom/relationship'
 import { sosaByPerson, sosaMap } from './layout/fan'
 import { useGedFile, type LoadedFile } from './source/loader'
 import { plural } from './util'
 import { AppContext, VIEWS, type AppState, type View } from './state'
-import { IconMoon, IconSearch, IconSun, Logo } from './ui/icons'
+import { IconDownload, IconMoon, IconPlus, IconSave, IconSearch, IconSun, Logo } from './ui/icons'
 import { PersonPanel } from './ui/PersonPanel'
 import { SearchPalette } from './ui/SearchPalette'
 import { Welcome } from './ui/Welcome'
@@ -81,7 +83,16 @@ export default function App() {
   return (
     <>
       {g.file ? (
-        <Viewer file={g.file} error={g.error} onClose={g.close} />
+        <Viewer
+          file={g.file}
+          error={g.error}
+          onClose={() => {
+            if (!g.file?.dirty || confirm('Des modifications ne sont pas enregistrées. Fermer quand même ?')) g.close()
+          }}
+          onEdit={g.edit}
+          onSave={g.save}
+          onDownload={g.download}
+        />
       ) : g.booting ? null : (
         <Welcome
           error={g.error}
@@ -90,6 +101,7 @@ export default function App() {
           onFile={g.loadPlainFile}
           onReopen={g.reopenSaved}
           onSample={g.loadSample}
+          onNew={() => g.createNew(editGedcom(newGedcom(), (d) => d.addPerson()).text)}
         />
       )}
       {dragging && <div className="dropzone">Déposez le fichier .ged ici</div>}
@@ -103,7 +115,16 @@ function readHash(): { view?: View; person?: string } {
   return { view: VIEWS.some((v) => v.id === view) ? view! : undefined, person: params.get('p') ?? undefined }
 }
 
-function Viewer({ file, error, onClose }: { file: LoadedFile; error: string | null; onClose: () => void }) {
+interface ViewerProps {
+  file: LoadedFile
+  error: string | null
+  onClose: () => void
+  onEdit: (text: string) => void
+  onSave: () => void
+  onDownload: () => void
+}
+
+function Viewer({ file, error, onClose, onEdit, onSave, onDownload }: ViewerProps) {
   const tree = useMemo<Tree>(() => buildTree(file.text), [file.text])
   const empty = tree.persons.size === 0
 
@@ -119,7 +140,9 @@ function Viewer({ file, error, onClose }: { file: LoadedFile; error: string | nu
     const h = readHash().person
     return h && tree.persons.has(h) ? h : pickRef()
   })
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  // A tree created from scratch opens on its first person, ready to fill in.
+  const [selectedId, setSelectedId] = useState<string | null>(() => (file.isNew ? (tree.order[0] ?? null) : null))
+  const [editingId, setEditingId] = useState<string | null>(() => (file.isNew ? (tree.order[0] ?? null) : null))
   const [view, setView] = useState<View>(() => readHash().view ?? 'arbre')
   const [searching, setSearching] = useState(false)
   const [pulse, setPulse] = useState(0)
@@ -129,6 +152,7 @@ function Viewer({ file, error, onClose }: { file: LoadedFile; error: string | nu
     if (!tree.persons.has(pinnedRefId)) setRefIdState(pickRef())
     if (!tree.persons.has(focusId)) setFocusId(pickRef())
     if (selectedId && !tree.persons.has(selectedId)) setSelectedId(null)
+    if (editingId && !tree.persons.has(editingId)) setEditingId(null)
     setPulse((n) => n + 1)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tree])
@@ -178,6 +202,17 @@ function Viewer({ file, error, onClose }: { file: LoadedFile; error: string | nu
     sosa,
     view,
     setView,
+    editingId,
+    setEditingId,
+    read: (fn) => fn(new GedDoc(parseGedcom(file.text))),
+    apply: (fn) => {
+      const { text, result } = editGedcom(file.text, fn)
+      onEdit(text)
+      if (typeof result === 'string') {
+        setSelectedId(result)
+        setEditingId(result)
+      }
+    },
   }
 
   if (empty) {
@@ -185,8 +220,13 @@ function Viewer({ file, error, onClose }: { file: LoadedFile; error: string | nu
       <main className="welcome">
         <div className="welcome__body">
           <h1>Fichier vide</h1>
-          <p>« {file.name} » ne contient aucune fiche de personne (INDI). Vérifiez qu’il s’agit bien d’un export GEDCOM.</p>
-          <button className="btn btn--primary" onClick={onClose}>Choisir un autre fichier</button>
+          <p>« {file.name} » ne contient aucune fiche de personne (INDI). Vous pouvez commencer l’arbre ici, ou vérifier qu’il s’agit bien d’un export GEDCOM.</p>
+          <div className="welcome__actions">
+            <button className="btn btn--primary" onClick={() => state.apply((d) => d.addPerson())}>
+              <IconPlus /> Ajouter une personne
+            </button>
+            <button className="btn" onClick={onClose}>Choisir un autre fichier</button>
+          </div>
         </div>
       </main>
     )
@@ -210,6 +250,21 @@ function Viewer({ file, error, onClose }: { file: LoadedFile; error: string | nu
             </span>
             <span>{file.live === 'none' ? '' : `à jour ${updated}`}</span>
             {error && <span className="error">{error}</span>}
+          </div>
+
+          <div className="savebar">
+            {file.dirty && <span className="savebar__state">Non enregistré</span>}
+            <button
+              className={`btn${file.dirty ? ' btn--primary' : ''}`}
+              onClick={onSave}
+              disabled={!file.dirty}
+              title={file.live === 'handle' ? `Enregistrer dans ${file.name}` : 'Enregistrer le fichier .ged'}
+            >
+              <IconSave /> Enregistrer
+            </button>
+            <button className="btn btn--quiet btn--icon" onClick={onDownload} aria-label="Télécharger une copie .ged" title="Télécharger une copie .ged">
+              <IconDownload />
+            </button>
           </div>
 
           <nav className="tabs" aria-label="Vues">

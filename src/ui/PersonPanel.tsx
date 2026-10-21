@@ -4,15 +4,24 @@ import { coupleInbreeding, formatInbreeding, inbreeding } from '../gedcom/inbree
 import { fullName, parents, siblings, unions, type Citation, type LifeEvent, type Person } from '../gedcom/model'
 import { useApp } from '../state'
 import { age, lifespan, sideColor, SIDE_LABEL } from '../util'
-import { IconClose, IconPin, IconTarget } from './icons'
+import { IconClose, IconEdit, IconPin, IconPlus, IconTarget } from './icons'
+import { PersonEditor } from './PersonEditor'
 
 export function PersonPanel({ id }: { id: string }) {
-  const { tree, refId, setRefId, focusId, focus, select, relations, sosa, view, setView } = useApp()
+  const { tree, refId, setRefId, focusId, focus, select, relations, sosa, view, setView, editingId, setEditingId, apply } = useApp()
   const p = tree.persons.get(id)
   if (!p) return null
 
+  if (editingId === id) {
+    return (
+      <aside className="panel" aria-label={`Modifier ${fullName(p)}`}>
+        <PersonEditor id={id} />
+      </aside>
+    )
+  }
+
   const rel = relations.get(id)
-  const { father, mother } = parents(tree, id)
+  const { family: parentsFamily, father, mother } = parents(tree, id)
   const sibs = siblings(tree, id)
   const us = unions(tree, id)
   const a = age(p)
@@ -59,6 +68,9 @@ export function PersonPanel({ id }: { id: string }) {
             <IconPin /> Prendre comme référence
           </button>
         )}
+        <button className="btn" onClick={() => setEditingId(id)}>
+          <IconEdit /> Modifier
+        </button>
       </div>
 
       {p.events.length > 0 && (
@@ -75,8 +87,8 @@ export function PersonPanel({ id }: { id: string }) {
       <h3>Famille</h3>
       <h4>Parents</h4>
       <div className="chips">
-        {father ? <PersonChip p={father} /> : <GhostChip label="Père inconnu" />}
-        {mother ? <PersonChip p={mother} /> : <GhostChip label="Mère inconnue" />}
+        {father ? <PersonChip p={father} /> : <AddChip label="Ajouter le père" onClick={() => apply((d) => d.addParent(id, 'M'))} />}
+        {mother ? <PersonChip p={mother} /> : <AddChip label="Ajouter la mère" onClick={() => apply((d) => d.addParent(id, 'F'))} />}
       </div>
 
       {us.length > 0 && (
@@ -88,32 +100,39 @@ export function PersonPanel({ id }: { id: string }) {
             const facts = [marr && `mariage${marr.date ? ` ${formatYear(marr.date)}` : ''}`, div && `divorce${div.date ? ` ${formatYear(div.date)}` : ''}`].filter(Boolean).join(', ')
             return (
               <div className="union" key={family.id}>
-                {spouse ? <PersonChip p={spouse} /> : <GhostChip label="Conjoint inconnu" />}
+                {spouse ? <PersonChip p={spouse} /> : <AddChip label="Ajouter le conjoint" onClick={() => apply((d) => d.addSpouse(id, family.id))} />}
                 {facts && <div className="union__label">{facts}</div>}
                 {family.husband && family.wife && <CoupleInbreeding husband={family.husband} wife={family.wife} />}
                 {family.notes.map((n, i) => (
                   <p className="union__label" key={i}>{n}</p>
                 ))}
-                {children.length > 0 && (
-                  <div className="chips" style={{ marginTop: '0.2rem' }}>
-                    {children.map((c) => (
-                      <PersonChip key={c.id} p={c} />
-                    ))}
-                  </div>
-                )}
+                <div className="chips" style={{ marginTop: '0.2rem' }}>
+                  {children.map((c) => (
+                    <PersonChip key={c.id} p={c} />
+                  ))}
+                  <AddChip label="Ajouter un enfant" onClick={() => apply((d) => d.addChild(id, family.id))} />
+                </div>
               </div>
             )
           })}
         </>
       )}
+      {/* a single-parent union already offers its own "add partner" */}
+      {us.every((u) => u.spouse) && (
+        <div className="chips" style={{ marginTop: '0.6rem' }}>
+          <AddChip label={us.length ? 'Ajouter une autre union' : 'Ajouter un conjoint'} onClick={() => apply((d) => d.addSpouse(id))} />
+          {!us.length && <AddChip label="Ajouter un enfant" onClick={() => apply((d) => d.addChild(id))} />}
+        </div>
+      )}
 
-      {sibs.length > 0 && (
+      {(sibs.length > 0 || parentsFamily) && (
         <>
           <h4>Frères et sœurs</h4>
           <div className="chips">
             {sibs.map((s) => (
               <PersonChip key={s.person.id} p={s.person} extra={s.half ? 'demi' : undefined} />
             ))}
+            {parentsFamily && <AddChip label="Ajouter un frère ou une sœur" onClick={() => apply((d) => d.addChild(id, parentsFamily.id))} />}
           </div>
         </>
       )}
@@ -234,12 +253,13 @@ function PersonChip({ p, extra }: { p: Person; extra?: string }) {
   )
 }
 
-function GhostChip({ label }: { label: string }) {
+/** Placeholder for a missing relative: clicking creates them and opens their card for editing. */
+function AddChip({ label, onClick }: { label: string; onClick: () => void }) {
   return (
-    <div className="chip chip--ghost">
-      <i className="dot dot--ghost" />
+    <button className="chip chip--add" onClick={onClick}>
+      <IconPlus className="chip__plus" />
       {label}
-    </div>
+    </button>
   )
 }
 

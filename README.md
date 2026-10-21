@@ -20,6 +20,14 @@ Le fichier est lu dans le navigateur : rien n’est envoyé sur un serveur.
 - **À compléter** : les ancêtres directs sans parents connus (les « pistes de recherche »), les incohérences de dates (enfant né après le décès du père, parent trop jeune…), les notes marquées « à confirmer » et le taux de complétude.
 - **Fiche personne** : événements avec lieux et sources, parents, unions, enfants, fratrie, notes (avec liens cliquables).
 
+## Modifier ou créer un arbre
+
+- **Créer un arbre** depuis l’accueil : on part d’une première personne, puis on ajoute père, mère, conjoints, enfants, frères et sœurs depuis sa fiche.
+- **Modifier** une fiche : prénoms, nom, sexe, naissance, décès, mariages et notes. Les dates s’écrivent en français (`17/06/1998`, `vers 1900`, `avant 1950`, `entre 1870 et 1875`), les lieux déjà présents sont proposés pendant la saisie.
+- **Enregistrer** : dans Chrome et Edge, le fichier ouvert est réécrit directement (ou un emplacement est demandé pour un nouvel arbre) ; ailleurs, le `.ged` est téléchargé. Le bouton de téléchargement donne une copie à tout moment.
+
+Souche ne modifie que ce qu’on change : les autres données du fichier (sources, médias, balises propres à un logiciel) sont conservées telles quelles.
+
 Les couleurs suivent la lignée : bleu pour le côté paternel, framboise pour le côté maternel, ocre pour la descendance, gris pour les alliances. Le lien de parenté est calculé en français (« cousine issue de germain », « oncle à la mode de Bretagne », « belle-mère »…) depuis une personne de référence, modifiable dans la fiche.
 
 ## Utilisation

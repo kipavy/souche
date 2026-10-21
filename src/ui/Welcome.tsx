@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { canWatchFiles } from '../source/loader'
-import { IconFile } from './icons'
+import { IconFile, IconPlus } from './icons'
 
 interface Props {
   error: string | null
@@ -9,9 +9,10 @@ interface Props {
   onFile: (f: File) => void
   onReopen: () => void
   onSample: () => void
+  onNew: () => void
 }
 
-export function Welcome({ error, savedName, onOpen, onFile, onReopen, onSample }: Props) {
+export function Welcome({ error, savedName, onOpen, onFile, onReopen, onSample, onNew }: Props) {
   const input = useRef<HTMLInputElement>(null)
 
   return (
@@ -19,7 +20,7 @@ export function Welcome({ error, savedName, onOpen, onFile, onReopen, onSample }
       <Rings />
       <div className="welcome__body">
         <h1>Souche</h1>
-        <p>Votre arbre généalogique, lisible d’un coup d’œil. Ouvrez un fichier GEDCOM (.ged) : il reste sur cet appareil, rien n’est envoyé nulle part.</p>
+        <p>Votre arbre généalogique, lisible d’un coup d’œil. Ouvrez un fichier GEDCOM (.ged) ou commencez-en un : il reste sur cet appareil, rien n’est envoyé nulle part.</p>
         {error && <p className="error">{error}</p>}
         <div className="welcome__actions">
           {savedName && (
@@ -34,6 +35,9 @@ export function Welcome({ error, savedName, onOpen, onFile, onReopen, onSample }
             }}
           >
             <IconFile /> Ouvrir un fichier .ged
+          </button>
+          <button className="btn" onClick={onNew}>
+            <IconPlus /> Créer un arbre
           </button>
           <button className="btn" onClick={onSample}>
             Voir un exemple
