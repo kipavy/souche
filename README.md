@@ -22,6 +22,8 @@ Le fichier est lu dans le navigateur : rien n’est envoyé sur un serveur.
 
 ## Modifier ou créer un arbre
 
+![Fiche en mode modification : prénoms, nom, sexe, dates et lieux](docs/edition.jpg)
+
 - **Créer un arbre** depuis l’accueil : on part d’une première personne, puis on ajoute père, mère, conjoints, enfants, frères et sœurs depuis sa fiche.
 - **Modifier** une fiche : prénoms, nom, sexe, naissance, décès, mariages et notes. Les dates s’écrivent en français (`17/06/1998`, `vers 1900`, `avant 1950`, `entre 1870 et 1875`), les lieux déjà présents sont proposés pendant la saisie.
 - **Enregistrer** : dans Chrome et Edge, le fichier ouvert est réécrit directement (ou un emplacement est demandé pour un nouvel arbre) ; ailleurs, le `.ged` est téléchargé. Le bouton de téléchargement donne une copie à tout moment.
