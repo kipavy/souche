@@ -414,13 +414,27 @@ select {
   border-radius: 12px;
   box-shadow: var(--shadow-float);
 }
-.overlay--controls {
+/* Bottom strip holding the controls (left) and the legend (right). When both do not fit,
+   wrap-reverse puts the legend on a line above instead of under the controls. */
+.overlay-dock {
+  position: absolute;
   left: 1rem;
-  bottom: 1rem;
-}
-.overlay--legend {
   right: 1rem;
   bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap-reverse;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.6rem;
+  pointer-events: none;
+}
+.overlay-dock > .overlay {
+  position: static;
+  pointer-events: auto;
+  max-width: 100%;
+}
+.overlay--legend {
+  margin-left: auto;
   font-size: var(--step--1);
   color: var(--ink-2);
   gap: 0.75rem;
@@ -1294,10 +1308,13 @@ select {
   .overlay--legend {
     display: none;
   }
-  .overlay--controls {
+  .overlay-dock {
     left: 0.75rem;
     right: 0.75rem;
     bottom: 0.75rem;
+  }
+  .overlay--controls {
+    flex: 1;
     gap: 0.6rem;
   }
   .hint {

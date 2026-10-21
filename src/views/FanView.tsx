@@ -117,18 +117,20 @@ export function FanView() {
 
       <p className="hint">Survol pour suivre une lignée, double-clic pour recentrer</p>
 
-      <div className="overlay overlay--controls">
-        <Stepper label="Générations" value={gens} min={2} max={10} onChange={setGens} />
-        <span className="overlay__sep" />
-        <button className="btn btn--quiet btn--icon" onClick={() => zoomBy(1.25)} aria-label="Zoomer"><IconPlus /></button>
-        <button className="btn btn--quiet btn--icon" onClick={() => zoomBy(0.8)} aria-label="Dézoomer"><IconMinus /></button>
-        <button className="btn btn--quiet btn--icon" onClick={() => fit(bounds, { max: 1.4, padding: 24 })} aria-label="Tout afficher"><IconFit /></button>
-      </div>
+      <div className="overlay-dock">
+        <div className="overlay overlay--controls">
+          <Stepper label="Générations" value={gens} min={2} max={10} onChange={setGens} />
+          <span className="overlay__sep" />
+          <button className="btn btn--quiet btn--icon" onClick={() => zoomBy(1.25)} aria-label="Zoomer"><IconPlus /></button>
+          <button className="btn btn--quiet btn--icon" onClick={() => zoomBy(0.8)} aria-label="Dézoomer"><IconMinus /></button>
+          <button className="btn btn--quiet btn--icon" onClick={() => fit(bounds, { max: 1.4, padding: 24 })} aria-label="Tout afficher"><IconFit /></button>
+        </div>
 
-      <div className="overlay overlay--legend" aria-label="Légende">
-        <span><i className="dot" style={{ background: 'var(--paternal)' }} />Lignée du père</span>
-        <span><i className="dot" style={{ background: 'var(--maternal)' }} />Lignée de la mère</span>
-        <span><i className="dot dot--ghost" />Ancêtre à trouver</span>
+        <div className="overlay overlay--legend" aria-label="Légende">
+          <span><i className="dot" style={{ background: 'var(--paternal)' }} />Lignée du père</span>
+          <span><i className="dot" style={{ background: 'var(--maternal)' }} />Lignée de la mère</span>
+          <span><i className="dot dot--ghost" />Ancêtre à trouver</span>
+        </div>
       </div>
     </div>
   )

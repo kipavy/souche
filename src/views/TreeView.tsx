@@ -77,28 +77,31 @@ export function TreeView() {
 
       <p className="hint">Double-clic sur une personne pour recentrer l’arbre</p>
 
-      <div className="overlay overlay--controls">
-        <Stepper label="Ascendants" value={up} min={0} max={12} onChange={setUp} />
-        <Stepper label="Descendants" value={down} min={0} max={10} onChange={setDown} />
-        <label className="switch">
-          <input type="checkbox" checked={showSiblings} onChange={(e) => setShowSiblings(e.target.checked)} />
-          Frères et sœurs
-        </label>
-        <label className="switch" title={up < 2 ? 'Affichez au moins 2 générations d’ascendants' : undefined}>
-          <input type="checkbox" checked={showUncles} disabled={up < 2} onChange={(e) => setShowUncles(e.target.checked)} />
-          Oncles et tantes
-        </label>
-        <label className="switch" title="Couleurs, liens de parenté et numéros Sosa calculés depuis la personne au centre">
-          <input type="checkbox" checked={refFollowsFocus} onChange={(e) => setRefFollowsFocus(e.target.checked)} />
-          Couleurs depuis le centre
-        </label>
-        <span className="overlay__sep" />
-        <button className="btn btn--quiet btn--icon" onClick={() => zoomBy(1.25)} aria-label="Zoomer"><IconPlus /></button>
-        <button className="btn btn--quiet btn--icon" onClick={() => zoomBy(0.8)} aria-label="Dézoomer"><IconMinus /></button>
-        <button className="btn btn--quiet btn--icon" onClick={() => fit(layout.bounds)} aria-label="Tout afficher"><IconFit /></button>
-      </div>
+      {/* controls and legend share the bottom edge; the legend moves up when they do not fit side by side */}
+      <div className="overlay-dock">
+        <div className="overlay overlay--controls">
+          <Stepper label="Ascendants" value={up} min={0} max={12} onChange={setUp} />
+          <Stepper label="Descendants" value={down} min={0} max={10} onChange={setDown} />
+          <label className="switch">
+            <input type="checkbox" checked={showSiblings} onChange={(e) => setShowSiblings(e.target.checked)} />
+            Frères et sœurs
+          </label>
+          <label className="switch" title={up < 2 ? 'Affichez au moins 2 générations d’ascendants' : undefined}>
+            <input type="checkbox" checked={showUncles} disabled={up < 2} onChange={(e) => setShowUncles(e.target.checked)} />
+            Oncles et tantes
+          </label>
+          <label className="switch" title="Couleurs, liens de parenté et numéros Sosa calculés depuis la personne au centre">
+            <input type="checkbox" checked={refFollowsFocus} onChange={(e) => setRefFollowsFocus(e.target.checked)} />
+            Couleurs depuis le centre
+          </label>
+          <span className="overlay__sep" />
+          <button className="btn btn--quiet btn--icon" onClick={() => zoomBy(1.25)} aria-label="Zoomer"><IconPlus /></button>
+          <button className="btn btn--quiet btn--icon" onClick={() => zoomBy(0.8)} aria-label="Dézoomer"><IconMinus /></button>
+          <button className="btn btn--quiet btn--icon" onClick={() => fit(layout.bounds)} aria-label="Tout afficher"><IconFit /></button>
+        </div>
 
-      <Legend />
+        <Legend />
+      </div>
     </>
   )
 }
