@@ -41,6 +41,9 @@ export const IconEdit = (p: SVGProps<SVGSVGElement>) => (
 export const IconTrash = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base} {...p} aria-hidden="true"><path d="M4.5 7h15M10 7V4.5h4V7M6.5 7l1 13h9l1-13M10 11v5.5M14 11v5.5" /></svg>
 )
+export const IconSliders = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p} aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9" /><circle cx="15" cy="7" r="2" /><circle cx="9" cy="17" r="2" /></svg>
+)
 export const IconMoon = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base} {...p} aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" /></svg>
 )

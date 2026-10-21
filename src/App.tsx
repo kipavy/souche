@@ -260,7 +260,7 @@ function Viewer({ file, error, onClose, onEdit, onSave, onDownload }: ViewerProp
               disabled={!file.dirty}
               title={file.live === 'handle' ? `Enregistrer dans ${file.name}` : 'Enregistrer le fichier .ged'}
             >
-              <IconSave /> Enregistrer
+              <IconSave /> <span className="savebar__label">Enregistrer</span>
             </button>
             <button className="btn btn--quiet btn--icon" onClick={onDownload} aria-label="Télécharger une copie .ged" title="Télécharger une copie .ged">
               <IconDownload />

@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { hourglass, ROW } from '../layout/hourglass'
 import { useApp } from '../state'
-import { IconFit, IconMinus, IconPlus } from '../ui/icons'
+import { IconFit, IconMinus, IconPlus, IconSliders } from '../ui/icons'
 import { PersonCard } from '../ui/PersonCard'
 import { Stepper } from '../ui/Stepper'
 import { useZoom } from '../ui/useZoom'
@@ -82,18 +82,20 @@ export function TreeView() {
         <div className="overlay overlay--controls">
           <Stepper label="Ascendants" value={up} min={0} max={12} onChange={setUp} />
           <Stepper label="Descendants" value={down} min={0} max={10} onChange={setDown} />
-          <label className="switch">
-            <input type="checkbox" checked={showSiblings} onChange={(e) => setShowSiblings(e.target.checked)} />
-            Frères et sœurs
-          </label>
-          <label className="switch" title={up < 2 ? 'Affichez au moins 2 générations d’ascendants' : undefined}>
-            <input type="checkbox" checked={showUncles} disabled={up < 2} onChange={(e) => setShowUncles(e.target.checked)} />
-            Oncles et tantes
-          </label>
-          <label className="switch" title="Couleurs, liens de parenté et numéros Sosa calculés depuis la personne au centre">
-            <input type="checkbox" checked={refFollowsFocus} onChange={(e) => setRefFollowsFocus(e.target.checked)} />
-            Couleurs depuis le centre
-          </label>
+          <QuickSettings>
+            <label className="switch">
+              <input type="checkbox" checked={showSiblings} onChange={(e) => setShowSiblings(e.target.checked)} />
+              Frères et sœurs
+            </label>
+            <label className="switch" title={up < 2 ? 'Affichez au moins 2 générations d’ascendants' : undefined}>
+              <input type="checkbox" checked={showUncles} disabled={up < 2} onChange={(e) => setShowUncles(e.target.checked)} />
+              Oncles et tantes
+            </label>
+            <label className="switch" title="Couleurs, liens de parenté et numéros Sosa calculés depuis la personne au centre">
+              <input type="checkbox" checked={refFollowsFocus} onChange={(e) => setRefFollowsFocus(e.target.checked)} />
+              Couleurs depuis le centre
+            </label>
+          </QuickSettings>
           <span className="overlay__sep" />
           <button className="btn btn--quiet btn--icon" onClick={() => zoomBy(1.25)} aria-label="Zoomer"><IconPlus /></button>
           <button className="btn btn--quiet btn--icon" onClick={() => zoomBy(0.8)} aria-label="Dézoomer"><IconMinus /></button>
@@ -106,11 +108,42 @@ export function TreeView() {
   )
 }
 
+/** Display options tucked behind a button so the bottom bar stays short. */
+function QuickSettings({ children }: { children: ReactNode }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!open) return
+    const away = (e: PointerEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false)
+    }
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
+    document.addEventListener('pointerdown', away)
+    document.addEventListener('keydown', esc)
+    return () => {
+      document.removeEventListener('pointerdown', away)
+      document.removeEventListener('keydown', esc)
+    }
+  }, [open])
+  return (
+    <div className="quick" ref={ref}>
+      <button className={`btn btn--quiet${open ? ' btn--active' : ''}`} aria-expanded={open} aria-haspopup="true" onClick={() => setOpen((o) => !o)}>
+        <IconSliders /> Affichage
+      </button>
+      {open && (
+        <div className="quick__menu" role="group" aria-label="Options d’affichage">
+          {children}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function Legend() {
   return (
     <div className="overlay overlay--legend" aria-label="Légende">
-      <span><i className="dot" style={{ background: 'var(--paternal)' }} />Côté paternel</span>
-      <span><i className="dot" style={{ background: 'var(--maternal)' }} />Côté maternel</span>
+      <span><i className="dot" style={{ background: 'var(--paternal)' }} />Paternel</span>
+      <span><i className="dot" style={{ background: 'var(--maternal)' }} />Maternel</span>
       <span><i className="dot dot--split" />Fratrie</span>
       <span><i className="dot" style={{ background: 'var(--descendant)' }} />Descendance</span>
       <span><i className="dot" style={{ background: 'var(--alliance)' }} />Par alliance</span>
