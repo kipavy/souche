@@ -6,6 +6,10 @@ export interface LoadedFile {
   /** How the file stays in sync: dev server watch, browser file handle, or a one-off copy. */
   live: 'dev' | 'handle' | 'none'
   loadedAt: number
+  /** Edited in Souche and not saved yet. */
+  dirty?: boolean
+  /** Just created from scratch: the viewer opens the first person for editing. */
+  isNew?: boolean
 }
 
 // ---------- tiny IndexedDB store for the file handle ----------
@@ -46,13 +50,41 @@ export function decode(buf: ArrayBuffer): string {
 
 type PickerWindow = Window & {
   showOpenFilePicker?: (opts: unknown) => Promise<FileSystemFileHandle[]>
+  showSaveFilePicker?: (opts: unknown) => Promise<FileSystemFileHandle>
 }
 type PermissionHandle = FileSystemFileHandle & {
-  queryPermission?: (o: { mode: 'read' }) => Promise<PermissionState>
-  requestPermission?: (o: { mode: 'read' }) => Promise<PermissionState>
+  queryPermission?: (o: { mode: 'read' | 'readwrite' }) => Promise<PermissionState>
+  requestPermission?: (o: { mode: 'read' | 'readwrite' }) => Promise<PermissionState>
+}
+type WritableHandle = FileSystemFileHandle & {
+  createWritable?: () => Promise<{ write: (data: Blob | string) => Promise<void>; close: () => Promise<void> }>
 }
 
 export const canWatchFiles = typeof window !== 'undefined' && 'showOpenFilePicker' in window
+const GED_TYPES = [{ description: 'Arbre GEDCOM', accept: { 'text/plain': ['.ged', '.gedcom'] } }]
+
+/** Hands the text to the browser as a file to save. */
+export function downloadText(name: string, text: string) {
+  const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }))
+  const a = document.createElement('a')
+  a.href = url
+  a.download = /\.ged(com)?$/i.test(name) ? name : `${name}.ged`
+  document.body.append(a)
+  a.click()
+  a.remove()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
+async function writeHandle(h: FileSystemFileHandle, text: string): Promise<boolean> {
+  const ph = h as PermissionHandle & WritableHandle
+  if (!ph.createWritable) return false
+  const state = (await ph.queryPermission?.({ mode: 'readwrite' })) ?? 'granted'
+  if (state !== 'granted' && (await ph.requestPermission?.({ mode: 'readwrite' })) !== 'granted') return false
+  const w = await ph.createWritable()
+  await w.write(text)
+  await w.close()
+  return true
+}
 
 export function useGedFile() {
   const [file, setFile] = useState<LoadedFile | null>(null)
@@ -61,10 +93,15 @@ export function useGedFile() {
   const [booting, setBooting] = useState(true)
   const handleRef = useRef<FileSystemFileHandle | null>(null)
   const lastModified = useRef(0)
+  // Unsaved edits win over a reload from disk.
+  const dirtyRef = useRef(false)
+  useEffect(() => {
+    dirtyRef.current = !!file?.dirty
+  }, [file?.dirty])
 
   const readHandle = useCallback(async (h: FileSystemFileHandle, force = false) => {
     const f = await h.getFile()
-    if (!force && f.lastModified === lastModified.current) return
+    if (!force && (f.lastModified === lastModified.current || dirtyRef.current)) return
     lastModified.current = f.lastModified
     setFile({ name: f.name, text: decode(await f.arrayBuffer()), live: 'handle', loadedAt: Date.now() })
     setError(null)
@@ -73,7 +110,9 @@ export function useGedFile() {
   // Dev server watch (npm run dev with SOUCHE_FILE set), then a remembered file handle.
   useEffect(() => {
     let cancelled = false
-    const onDevChange = () => void fromDev()
+    const onDevChange = () => {
+      if (!dirtyRef.current) void fromDev()
+    }
     const fromDev = async () => {
       if (!import.meta.env.DEV) return false
       const res = await fetch('/__souche/file').catch(() => null)
@@ -166,5 +205,62 @@ export function useGedFile() {
     setFile(null)
   }, [])
 
-  return { file, error, booting, savedHandle, openWithPicker, reopenSaved, loadPlainFile, loadSample, close }
+  /** Replaces the text after an edit made in Souche. */
+  const edit = useCallback((text: string) => {
+    setFile((f) => (f ? { ...f, text, dirty: true, isNew: false, loadedAt: Date.now() } : f))
+  }, [])
+
+  const createNew = useCallback((text: string) => {
+    handleRef.current = null
+    setFile({ name: 'mon-arbre.ged', text, live: 'none', loadedAt: Date.now(), dirty: true, isNew: true })
+    setError(null)
+  }, [])
+
+  const markSaved = useCallback((patch: Partial<LoadedFile> = {}) => {
+    setFile((f) => (f ? { ...f, ...patch, dirty: false } : f))
+  }, [])
+
+  /** Writes back to the opened file when the browser allows it, else asks where to save (or downloads). */
+  const save = useCallback(async (): Promise<'saved' | 'downloaded' | 'cancelled'> => {
+    if (!file) return 'cancelled'
+    try {
+      const h = handleRef.current
+      if (h && (await writeHandle(h, file.text))) {
+        lastModified.current = (await h.getFile()).lastModified
+        markSaved()
+        return 'saved'
+      }
+      const w = window as PickerWindow
+      if (w.showSaveFilePicker) {
+        const nh = await w.showSaveFilePicker({ suggestedName: file.name, types: GED_TYPES })
+        if (await writeHandle(nh, file.text)) {
+          handleRef.current = nh
+          await saveHandle(nh)
+          lastModified.current = (await nh.getFile()).lastModified
+          markSaved({ name: nh.name, live: 'handle' })
+          return 'saved'
+        }
+      }
+    } catch (e) {
+      if ((e as DOMException).name === 'AbortError') return 'cancelled'
+      setError('Enregistrement impossible : le fichier a été téléchargé à la place.')
+    }
+    downloadText(file.name, file.text)
+    markSaved()
+    return 'downloaded'
+  }, [file, markSaved])
+
+  const download = useCallback(() => {
+    if (file) downloadText(file.name, file.text)
+  }, [file])
+
+  // Closing the tab with unsaved edits asks first.
+  useEffect(() => {
+    if (!file?.dirty) return
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault()
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [file?.dirty])
+
+  return { file, error, booting, savedHandle, openWithPicker, reopenSaved, loadPlainFile, loadSample, close, edit, createNew, save, download }
 }

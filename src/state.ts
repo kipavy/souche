@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react'
+import type { GedDoc } from './gedcom/edit'
 import type { Tree } from './gedcom/model'
 import type { Relation } from './gedcom/relationship'
 
@@ -30,6 +31,13 @@ export interface AppState {
   sosa: Map<string, number[]>
   view: View
   setView: (v: View) => void
+  /** Person whose card is open in edit mode. */
+  editingId: string | null
+  setEditingId: (id: string | null) => void
+  /** Reads the raw GEDCOM records (for edit forms). */
+  read: <T>(fn: (doc: GedDoc) => T) => T
+  /** Applies an edit to the file; when it returns a person id, that person is opened for editing. */
+  apply: (fn: (doc: GedDoc) => string | void) => void
 }
 
 export const AppContext = createContext<AppState | null>(null)
