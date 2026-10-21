@@ -23,7 +23,7 @@ const write = (k: string, v: unknown) => {
 }
 
 export function TreeView() {
-  const { tree, focusId, focus, selectedId, select, relations, sosa } = useApp()
+  const { tree, focusId, focus, selectedId, select, relations, sosa, refFollowsFocus, setRefFollowsFocus } = useApp()
   const [up, setUp] = useState(() => read('souche.up', 3))
   const [down, setDown] = useState(() => read('souche.down', 2))
   const [showSiblings, setShowSiblings] = useState(() => read('souche.siblings', 1) === 1)
@@ -87,6 +87,10 @@ export function TreeView() {
         <label className="switch" title={up < 2 ? 'Affichez au moins 2 générations d’ascendants' : undefined}>
           <input type="checkbox" checked={showUncles} disabled={up < 2} onChange={(e) => setShowUncles(e.target.checked)} />
           Oncles et tantes
+        </label>
+        <label className="switch" title="Couleurs, liens de parenté et numéros Sosa calculés depuis la personne au centre">
+          <input type="checkbox" checked={refFollowsFocus} onChange={(e) => setRefFollowsFocus(e.target.checked)} />
+          Couleurs depuis le centre
         </label>
         <span className="overlay__sep" />
         <button className="btn btn--quiet btn--icon" onClick={() => zoomBy(1.25)} aria-label="Zoomer"><IconPlus /></button>

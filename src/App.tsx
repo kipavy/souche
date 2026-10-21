@@ -113,7 +113,8 @@ function Viewer({ file, error, onClose }: { file: LoadedFile; error: string | nu
     return saved && tree.persons.has(saved) ? saved : (tree.order[0] ?? '')
   }, [refKey, tree])
 
-  const [refId, setRefIdState] = useState(pickRef)
+  const [pinnedRefId, setRefIdState] = useState(pickRef)
+  const [refFollowsFocus, setRefFollowsFocusState] = useState(() => store.get('souche.refFollowsFocus') === '1')
   const [focusId, setFocusId] = useState(() => {
     const h = readHash().person
     return h && tree.persons.has(h) ? h : pickRef()
@@ -125,7 +126,7 @@ function Viewer({ file, error, onClose }: { file: LoadedFile; error: string | nu
 
   // Live reload: keep where we were if those people still exist.
   useEffect(() => {
-    if (!tree.persons.has(refId)) setRefIdState(pickRef())
+    if (!tree.persons.has(pinnedRefId)) setRefIdState(pickRef())
     if (!tree.persons.has(focusId)) setFocusId(pickRef())
     if (selectedId && !tree.persons.has(selectedId)) setSelectedId(null)
     setPulse((n) => n + 1)
@@ -149,6 +150,7 @@ function Viewer({ file, error, onClose }: { file: LoadedFile; error: string | nu
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
+  const refId = refFollowsFocus && tree.persons.has(focusId) ? focusId : pinnedRefId
   const relations = useMemo(() => allRelations(tree, refId), [tree, refId])
   const sosa = useMemo(() => sosaByPerson(sosaMap(tree, refId)), [tree, refId])
   const incoherent = useMemo(() => auditTree(tree).filter((i) => i.kind === 'incoherent').length, [tree])
@@ -159,6 +161,14 @@ function Viewer({ file, error, onClose }: { file: LoadedFile; error: string | nu
     setRefId: (id) => {
       setRefIdState(id)
       store.set(refKey, id)
+      // Picking a reference by hand means it should stay put.
+      setRefFollowsFocusState(false)
+      store.set('souche.refFollowsFocus', '0')
+    },
+    refFollowsFocus,
+    setRefFollowsFocus: (on) => {
+      setRefFollowsFocusState(on)
+      store.set('souche.refFollowsFocus', on ? '1' : '0')
     },
     focusId,
     focus: setFocusId,

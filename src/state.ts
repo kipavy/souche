@@ -17,6 +17,9 @@ export interface AppState {
   /** The person relationships are expressed from (usually yourself). */
   refId: string
   setRefId: (id: string) => void
+  /** When on, the reference follows whoever the tree is centered on (colors, labels, Sosa). */
+  refFollowsFocus: boolean
+  setRefFollowsFocus: (on: boolean) => void
   /** Who the tree and fan are centered on. */
   focusId: string
   focus: (id: string) => void
